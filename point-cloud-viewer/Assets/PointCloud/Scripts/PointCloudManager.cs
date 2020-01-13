@@ -83,6 +83,7 @@ public class PointCloudManager : MonoBehaviour {
         // Read file
         StreamReader sr = new StreamReader (filepath);
 
+        // Line one is the number of points
         string numPointsString = sr.ReadLine();
         int numPoints = 0;
         if(!int.TryParse(numPointsString, out numPoints))
@@ -116,7 +117,6 @@ public class PointCloudManager : MonoBehaviour {
 			
 			if (buffer.Length >= 5)
                 colors[i] = new Color( float.Parse( buffer[3] ), float.Parse( buffer[4] ), float.Parse( buffer[5] ) );
-                //colors[i] = new Color (int.Parse (buffer[3])/255.0f,int.Parse (buffer[4])/255.0f,int.Parse (buffer[5])/255.0f);
 			else
 				colors[i] = Color.cyan;
 
@@ -131,8 +131,9 @@ public class PointCloudManager : MonoBehaviour {
 			}
 		}
 
-		
-		// Instantiate Point Groups
+
+        // Instantiate Point Groups
+        /*
 		numPointGroups = Mathf.CeilToInt (numPoints*1.0f / limitPoints*1.0f);
 
 		pointCloud = new GameObject (filename);
@@ -145,9 +146,15 @@ public class PointCloudManager : MonoBehaviour {
 			}
 		}
 		InstantiateMesh (numPointGroups-1, numPoints- (numPointGroups-1) * limitPoints);
+        */
 
-		//Store PointCloud
-		UnityEditor.PrefabUtility.CreatePrefab ("Assets/Resources/PointCloudMeshes/" + filename + ".prefab", pointCloud);
+        limitPoints = 0;
+        numPointGroups = 0;
+        pointCloud = new GameObject( filename );
+        InstantiateMesh( 0, numPoints );
+
+        //Store PointCloud
+        UnityEditor.PrefabUtility.CreatePrefab ("Assets/Resources/PointCloudMeshes/" + filename + ".prefab", pointCloud);
 
 		loaded = true;
 	}
@@ -176,7 +183,7 @@ public class PointCloudManager : MonoBehaviour {
 
 		// Store Mesh
 		UnityEditor.AssetDatabase.CreateAsset(pointGroup.GetComponent<MeshFilter> ().mesh, "Assets/Resources/PointCloudMeshes/" + filename + @"/" + filename + meshInd + ".asset");
-		UnityEditor.AssetDatabase.SaveAssets ();
+		UnityEditor.AssetDatabase.SaveAssets();
 		UnityEditor.AssetDatabase.Refresh();
 	}
 
@@ -184,8 +191,9 @@ public class PointCloudManager : MonoBehaviour {
     {
 		
 		Mesh mesh = new Mesh ();
-		
-		Vector3[] myPoints = new Vector3[nPoints]; 
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
+        Vector3[] myPoints = new Vector3[nPoints]; 
 		int[] indecies = new int[nPoints];
 		Color[] myColors = new Color[nPoints];
 
